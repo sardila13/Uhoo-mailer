@@ -10,6 +10,7 @@ const CsvReadableStream = require('csv-reader');
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
+    pool: true,
     auth: {
         user: 'sales@bcodesolutions.com',
         pass: 'LAbm2U**' // naturally, replace both with your real credentials or an application-specific password
@@ -56,11 +57,12 @@ function readCSv(){
 
 readCSv();
 
-function sendEmail(array){
+async function sendEmail(array){
     
     var offset = 0;
-    array.forEach(element => {
+    await Promise.all(array.map(async (element) => {
         console.log("User", element.name, ",",element.email,",",element.subject);
+
         setTimeout(() => {
             transporter.sendMail({
                 from: 'sales@bcodesolutions.com', // sender address
@@ -83,7 +85,15 @@ function sendEmail(array){
             })
         }, 1000 + offset);
         offset += 1000;
-    });
+    }))
+    .then(values => {
+        transporter.close();
+    })
+    
+    /*array.forEach(element => {
+        console.log("User", element.name, ",",element.email,",",element.subject);
+        
+    });*/
 }
 
 /*transporter.sendMail({
