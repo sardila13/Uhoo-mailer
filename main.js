@@ -26,6 +26,7 @@ function readCSv(){
     var name = undefined;
     var email = undefined;
     var sent = 0;
+    var emails = [];
     var subject = "El secreto de la productividad está en la felicidad de tus colaboradores, conoce Uhoo 🙌🏻.";
     inputStream
     .pipe(new CsvReadableStream({ parseNumbers: true, parseBooleans: true, trim: true }))
@@ -41,41 +42,48 @@ function readCSv(){
         }
         else{
             email = row[0];
-            subject = 
-            sendEmail(name, email, subject);
-            sent++;
+            emails.push({name: name, email:email, subject:subject})
         }
         count ++;
     })
     .on('end', function (data) {
         console.log('No more rows!');
+        //console.log(emails)
+        sendEmail(emails);
     });
  
 }
 
 readCSv();
 
-function sendEmail(name, email, subject){
-    console.log("User", name, ",",email,",",subject);
-    transporter.sendMail({
-        from: 'sales@bcodesolutions.com', // sender address
-        to: [email], // list of receivers
-        subject: subject, // Subject line
-        html: '<div height: 100em"><h2>¡Hola, ' + name + '!</h2><a href="https://landing.uhoo.io/"><img src="cid:uhoo"></a><h4>Juan Ardila S.</h4><h4>Uhoo Sales Representative</h4><h4>Cel: 317 680 7256</h4></div>',
-        attachments: [{
-            filename: 'Uhoo.png',
-            path: __dirname +'/img/Uhoo.png',
-            cid: 'uhoo' //my mistake was putting "cid:logo@cid" here! 
-       }]
-    }, function (err, info) {
-        sent++;
-        if(err){
-            console.log(err);
-        }
-        else{
-            console.log(info);
-        }
-    })
+function sendEmail(array){
+    
+    var offset = 0;
+    array.forEach(element => {
+        console.log("User", element.name, ",",element.email,",",element.subject);
+        setTimeout(() => {
+            transporter.sendMail({
+                from: 'sales@bcodesolutions.com', // sender address
+                to: [element.email], // list of receivers
+                subject: element.subject, // Subject line
+                html: '<div height: 100em"><h2>¡Hola, ' + element.name + '!</h2><a href="https://landing.uhoo.io/"><img src="cid:uhoo"></a><h4>Juan Ardila S.</h4><h4>Uhoo Sales Representative</h4><h4>Cel: 317 680 7256</h4></div>',
+                attachments: [{
+                    filename: 'Uhoo.png',
+                    path: __dirname +'/img/Uhoo.png',
+                    cid: 'uhoo' //my mistake was putting "cid:logo@cid" here! 
+               }]
+            }, function (err, info) {
+                sent++;
+                if(err){
+                    console.log(err);
+                }
+                else{
+                    console.log(info);
+                }
+            })
+        }, 1000 + offset);
+        offset += 1000;
+    });
 }
 
 /*transporter.sendMail({
