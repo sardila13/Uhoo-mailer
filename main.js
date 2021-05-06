@@ -43,6 +43,7 @@ function readCSv(){
         }
         else{
             email = row[0];
+            sent++;
             emails.push({name: name, email:email, subject:subject})
         }
         count ++;
@@ -64,6 +65,7 @@ async function sendEmail(array){
         console.log("User", element.name, ",",element.email,",",element.subject);
 
         setTimeout(() => {
+            console.log("Sending email to", element.name)
             transporter.sendMail({
                 from: 'sales@bcodesolutions.com', // sender address
                 to: [element.email], // list of receivers
@@ -87,7 +89,7 @@ async function sendEmail(array){
         offset += 1000;
     }))
     .then(values => {
-        transporter.close();
+        console.log("Closing mailer")
     })
     
     /*array.forEach(element => {
